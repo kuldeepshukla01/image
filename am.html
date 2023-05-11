@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Image Quiz</title>
+    <style>
+      #image {
+        max-width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Image Quiz</h1>
+    <div>
+      <img id="image" src="https://github.com/kuldeepshukla01/image.git" alt="Current Image">
+
+    </div>
+    <div>
+      <p>Time remaining: <span id="timer">60</span> seconds</p>
+    </div>
+    <div>
+      <label for="answer">Enter your answer:</label>
+      <input type="text" id="answer" name="answer">
+    </div>
+    <div>
+      <button id="submit">Submit</button>
+      <button id="start">Start Quiz</button>
+    </div>
+    <div>
+      <p id="result"></p>
+      <p id="score"></p>
+    </div>
+
+    <script>
+      let timeLeft = 60;
+      let timerId;
+      let currentImageUrl;
+      let correctAnswer;
+      let score = 0;
+
+      const imageElement = document.getElementById('image');
+      const timerElement = document.getElementById('timer');
+      const answerElement = document.getElementById('answer');
+      const submitButton = document.getElementById('submit');
+      const startButton = document.getElementById('start');
+      const resultElement = document.getElementById('result');
+      const scoreElement = document.getElementById('score');
+
+      function fetchImage() {
+        return fetch('https://github.com/kuldeepshukla01/image.git')
+          .then(response => response.url);
+      }
+
+      async function startQuiz() {
+        currentImageUrl = await fetchImage();
+        imageElement.src = currentImageUrl;
+        correctAnswer = currentImageUrl.split('/')[3];
+        startTimer();
+      }
+
+      function startTimer() {
+        timerId = setInterval(() => {
+          timeLeft--;
+          timerElement.textContent = timeLeft;
+          if (timeLeft === 0) {
+            clearInterval(timerId);
+            endQuiz();
+          }
+        }, 1000);
+      }
+
+      function endQuiz() {
+        resultElement.textContent = `You scored ${score} points!`;
+        answerElement.disabled = true;
+        submitButton.disabled = true;
+      }
+
+      function validateAnswer() {
+        const userAnswer = answerElement.value;
+        if (userAnswer === correctAnswer) {
+          resultElement.textContent = 'Correct!';
+          score++;
+          scoreElement.textContent = `Score: ${score}`;
+        } else {
+          resultElement.textContent = 'Incorrect.';
+        }
+        answerElement.value = '';
+        currentImageUrl = fetchImage();
+        imageElement.src = currentImageUrl;
+        correctAnswer = currentImageUrl.split('/')[3];
+      }
+
+      startButton.addEventListener('click', startQuiz);
+      submitButton.addEventListener('click', validateAnswer);
+    </script>
+  </body>
+</html>
